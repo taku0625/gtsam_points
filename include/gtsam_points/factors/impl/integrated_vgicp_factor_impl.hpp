@@ -122,6 +122,7 @@ double IntegratedVGICPFactor_<SourceFrame>::evaluate(
   for (int i = 0; i < frame::size(*source); i++) {
     const auto& target_voxel = correspondences[i];
     if (target_voxel == nullptr) {
+      sum_errors += 1.0;
       continue;
     }
 

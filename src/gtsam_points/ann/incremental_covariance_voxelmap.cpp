@@ -160,26 +160,26 @@ void IncrementalCovarianceVoxelMap::insert(const PointCloud& points) {
     eig_stats.push_back(sum_stats_new);
   }
 
-  prof.push("remove old invalid");
+//   prof.push("remove old invalid");
 
-  if (lru_counter % lru_clear_cycle == 0) {
-#pragma omp parallel for num_threads(num_threads) schedule(guided, 2)
-    for (size_t i = 0; i < flat_voxels.size(); i++) {
-      auto& voxel = flat_voxels[i];
-      voxel->second.remove_old_invalid(remove_invalid_age_thresh, lru_counter);
-    }
+//   if (lru_counter % lru_clear_cycle == 0) {
+// #pragma omp parallel for num_threads(num_threads) schedule(guided, 2)
+//     for (size_t i = 0; i < flat_voxels.size(); i++) {
+//       auto& voxel = flat_voxels[i];
+//       voxel->second.remove_old_invalid(remove_invalid_age_thresh, lru_counter);
+//     }
 
-    auto remove_loc = std::remove_if(flat_voxels.begin(), flat_voxels.end(), [](const auto& voxel) { return voxel->second.size() == 0; });
-    const bool needs_rehash = remove_loc != flat_voxels.end();
-    flat_voxels.erase(remove_loc, flat_voxels.end());
+//     auto remove_loc = std::remove_if(flat_voxels.begin(), flat_voxels.end(), [](const auto& voxel) { return voxel->second.size() == 0; });
+//     const bool needs_rehash = remove_loc != flat_voxels.end();
+//     flat_voxels.erase(remove_loc, flat_voxels.end());
 
-    if (needs_rehash) {
-      voxels.clear();
-      for (const auto& voxel : flat_voxels) {
-        voxels[voxel->first.coord] = voxels.size();
-      }
-    }
-  }
+//     if (needs_rehash) {
+//       voxels.clear();
+//       for (const auto& voxel : flat_voxels) {
+//         voxels[voxel->first.coord] = voxels.size();
+//       }
+//     }
+//   }
 
   prof.push("done");
 }
