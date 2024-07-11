@@ -17,12 +17,14 @@ jobs:
     strategy:
       matrix:
         DISTRO: [
+          { "ubuntu": "noble", "suffix": "gcc" },
+          { "ubuntu": "noble", "suffix": "llvm" },
           { "ubuntu": "jammy", "suffix": "gcc" },
           { "ubuntu": "jammy", "suffix": "llvm" },
           { "ubuntu": "jammy_cuda12.2", "suffix": "gcc.cuda" },
           { "ubuntu": "jammy_cuda12.2", "suffix": "llvm.cuda" },
-          { "ubuntu": "noble", "suffix": "gcc" },
-          { "ubuntu": "noble", "suffix": "llvm" }
+          { "ubuntu": "focal", "suffix": "focal" },
+          { "ubuntu": "focal_cuda12.2", "suffix": "focal.cuda" },
         ]
 
     steps:
@@ -32,16 +34,31 @@ jobs:
 
       - name: Docker login
         continue-on-error: true
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
       - name: Docker build
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v6
         with:
+          tags: koide3/gtsam_points:${{ matrix.DISTRO.ubuntu }}
           file: ${{github.workspace}}/docker/ubuntu/Dockerfile.${{ matrix.DISTRO.suffix }}
           build-args: |
             BASE_IMAGE=koide3/gtsam_docker:${{ matrix.DISTRO.ubuntu }}
           context: .
-          push: false
+          push: ${{ github.event_name == 'push' && (contains(matrix.DISTRO.suffix, 'gcc') || contains(matrix.DISTRO.suffix, 'focal')) }}
+
+  dispatch:
+    needs: build
+    strategy:
+      matrix:
+        repo: ['koide3/glim']
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.PAT }}
+          repository: ${{ matrix.repo }}
+          event-type: trigger-event

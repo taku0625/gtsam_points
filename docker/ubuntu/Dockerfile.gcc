@@ -10,8 +10,10 @@ RUN cmake .. \
   -DBUILD_TESTS=ON \
   -DBUILD_EXAMPLE=ON \
   -DBUILD_WITH_CUDA=OFF \
-  -DCMAKE_BUILD_TYPE=Release
-RUN make -j$(nproc)
-RUN make test
+  -DCMAKE_BUILD_TYPE=Release && \
+  make -j$(nproc) && \
+  make test && \
+  make install && \
+  rm -rf /root/gtsam_points/build
 
 CMD ["bash"]
