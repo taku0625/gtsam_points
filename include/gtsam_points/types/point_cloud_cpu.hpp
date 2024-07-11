@@ -320,7 +320,7 @@ merge_frames_auto(const std::vector<Eigen::Isometry3d>& poses, const std::vector
 
 template <typename PointCloudPtr>
 std::enable_if_t<!std::is_same_v<PointCloudPtr, PointCloud::ConstPtr>, PointCloud::Ptr>
-merge_frames_auto(const std::vector<Eigen::Isometry3d>& poses, const std::vector<PointCloud::ConstPtr>& frames, double downsample_resolution) {
+merge_frames_auto(const std::vector<Eigen::Isometry3d>& poses, const std::vector<PointCloud::Ptr>& frames, double downsample_resolution) {
   std::vector<PointCloud::ConstPtr> frames_(frames.begin(), frames.end());
   return merge_frames_auto(poses, frames_, downsample_resolution);
 }
