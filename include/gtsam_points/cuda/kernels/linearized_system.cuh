@@ -57,6 +57,18 @@ public:
     return system;
   }
 
+  __host__ __device__ static LinearizedSystem6 error_one() {
+    LinearizedSystem6 system;
+    system.error = 1.0f;
+    system.H_target.setZero();
+    system.H_source.setZero();
+    system.H_target_source.setZero();
+    system.b_target.setZero();
+    system.b_source.setZero();
+
+    return system;
+  }
+
 public:
   float error;
   Eigen::Matrix<float, 6, 6> H_target;

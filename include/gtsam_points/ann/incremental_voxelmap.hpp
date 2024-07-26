@@ -109,7 +109,7 @@ protected:
     }
   }
 
-protected:
+public:
   static_assert(sizeof(size_t) == 8, "size_t must be 64-bit");
   static constexpr int point_id_bits = 32;                  ///< Use the first 32 bits for point id
   static constexpr int voxel_id_bits = 64 - point_id_bits;  ///< Use the remaining bits for voxel id
