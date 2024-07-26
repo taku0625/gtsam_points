@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(gtsam_points VERSION 0.1.0 LANGUAGES CXX)
+project(gtsam_points VERSION 1.0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -45,16 +45,16 @@ if(BUILD_WITH_CUDA)
   if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.24.0")
     if(BUILD_WITH_CUDA_MULTIARCH)
       set(CMAKE_CUDA_ARCHITECTURES "all-major" CACHE STRING "CUDA architectures" FORCE)
-    else()
+    elseif(NOT DEFINED CMAKE_CUDA_ARCHITECTURES OR CMAKE_CUDA_ARCHITECTURES STREQUAL "52")
       set(CMAKE_CUDA_ARCHITECTURES "native" CACHE STRING "CUDA architectures" FORCE)
     endif()
   else()
     if(BUILD_WITH_CUDA_MULTIARCH)
-      set(CMAKE_CUDA_ARCHITECTURES 75 80 89 90 CACHE STRING "CUDA architectures" FORCE)
+      set(CMAKE_CUDA_ARCHITECTURES 75 80 87 89 90 CACHE STRING "CUDA architectures" FORCE)
     else()
       if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES OR CMAKE_CUDA_ARCHITECTURES STREQUAL "52")
-        message(WARNING "CMAKE_CUDA_ARCHITECTURES is not defined. Set to 89 by default")
-        set(CMAKE_CUDA_ARCHITECTURES 89 CACHE STRING "CUDA architectures" FORCE)
+        message(WARNING "CMAKE_CUDA_ARCHITECTURES is not defined. Set to 80 by default")
+        set(CMAKE_CUDA_ARCHITECTURES 80 CACHE STRING "CUDA architectures" FORCE)
       endif()
     endif()
   endif()
@@ -182,7 +182,7 @@ if(BUILD_WITH_CUDA)
     src/gtsam_points/cuda/cuda_device_prop.cu
     src/gtsam_points/cuda/cuda_graph.cu
     src/gtsam_points/cuda/cuda_graph_exec.cu
-    src/gtsam_points/cuda/gl_buffer_map.cu
+    # src/gtsam_points/cuda/gl_buffer_map.cu
     src/gtsam_points/cuda/nonlinear_factor_set_gpu.cu
     src/gtsam_points/cuda/nonlinear_factor_set_gpu_create.cu
     src/gtsam_points/cuda/stream_roundrobin.cu
@@ -313,3 +313,22 @@ install(FILES
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindGTSAM.cmake"
   DESTINATION ${CMAKE_CONFIG_INSTALL_DIR}
 )
+
+#############
+## Package ##
+#############
+
+set(CPACK_GENERATOR "DEB")
+set(CPACK_PACKAGE_NAME ${CMAKE_PROJECT_NAME})
+set(CPACK_SET_DESTDIR TRUE)
+set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "k.koide <k.koide@aist.go.jp>")
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+
+set(GNUInstallDirs)
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A collection of GTSAM factors for point cloud registration")
+set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/README.md")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
+set(CPACK_PACKAGE_VENDOR "k.koide")
+
+include(CPack)
